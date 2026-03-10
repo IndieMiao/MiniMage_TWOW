@@ -3,25 +3,30 @@
 MiniMage_TWOW is a lightweight World of Warcraft addon designed for Mages, providing quick access to portals and teleports via a convenient minimap button and dropdown menu. Perfect for both Horde and Alliance players, MiniMage_TWOW streamlines travel across Azeroth with just a click.
 
 ## Original Addon
-* I found MiniMage_v1.2b in the Wow1.12.1_Addons_Collection, I cannot find the orginal GitHub or anywhere else this addon is posted.
+* I found MiniMage_v1.2b in the Wow1.12.1_Addons_Collection, I cannot find the original GitHub or anywhere else this addon is posted.
 * I do not take credit for creating this addon, only modifying it to include TurtleWoW specific spells and adding a few features
 
 
-# Version 1.5
+# Version 1.6
 ## TurtleWoW Specific Features
- * Includes Alah'Thalas and Theramore for Alliance characters.
- * Includes Stonard for Horde characters.
+* Includes all supported major city Teleport/Portal spells in one dropdown for Mages.
+* Supports both Horde and Alliance city spells in the same menu.
+* Horde and Alliance city entries are separated with a divider line (no faction text labels).
+
+### Included Cities
+* Horde: Orgrimmar, Thunder Bluff, Stonard, Undercity
+* Alliance: Alah'Thalas, Theramore, Stormwind, Ironforge, Darnassus
 
 ## Features
 
 * **Minimap Button**: Drag and position a minimap button for easy access.
-* **Dropdown Menu**: Quick-cast portals and teleports, organized by faction.
-* **Faction Support**: Automatically shows relevant portal and teleport spells for Horde or Alliance Mages.
-* "Haven't Learned Spell" Message when trying to cast a Teleport/Portal you don't have trained.
+* **Dropdown Menu**: Quick-cast portals and teleports from a single unified city list.
+* **Menu Layout**: Horde city entries first, then a separator line, then Alliance city entries.
+* "Haven't Learned Spell" message when trying to cast a Teleport/Portal you do not have trained.
   
 * **Show/Hide Based on Level**: 
-* Portals Section Greyed out Until Level 40
-* Specific Portals/Teleports Greyed out until required level is reached
+* Portal section hidden until level 40 (and can be toggled with `/mmage portals`).
+* Specific Portals/Teleports are greyed out until required level is reached.
 
 
 
