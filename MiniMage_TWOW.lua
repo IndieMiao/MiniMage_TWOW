@@ -165,274 +165,79 @@ function MM_DropDown_InitButtons()
 
     UIDropDownMenu_AddButton(info);
 
-    local fact = UnitFactionGroup('player');
-    if (fact == "Horde") then
-        MM_DropDown_ForTheHorde();
-    else
-        MM_DropDown_ForTheAlliance();
-    end
+    MM_DropDown_AllCities();
 end
 
 -----------------------------------------------------
--- HORDE
+-- ALL CITIES (HORDE + ALLIANCE)
 -----------------------------------------------------
 
-function MM_DropDown_ForTheHorde()
-    local appender = ': ';
+local MM_HordeCities = {
+    { label = MINIMAGE_LABEL_ORG,       teleport = "Teleport: Orgrimmar",     portal = "Portal: Orgrimmar" },
+    { label = MINIMAGE_LABEL_TB,        teleport = "Teleport: Thunder Bluff", portal = "Portal: Thunder Bluff" },
+    { label = MINIMAGE_LABEL_STONARD,   teleport = "Teleport: Stonard",       portal = "Portal: Stonard" },
+    { label = MINIMAGE_LABEL_UC,        teleport = "Teleport: Undercity",     portal = "Portal: Undercity" },
+}
 
-    -- 🔥 REQUIRED ADDITION: Auto-hide portals if player level < 40
-    if UnitLevel("player") < 40 then
-        MiniMageOptions.HidePortals = true
-    end
+local MM_AllianceCities = {
+    { label = MINIMAGE_LABEL_ALAH,      teleport = "Teleport: Alah'Thalas",   portal = "Portal: Alah'Thalas" },
+    { label = MINIMAGE_LABEL_THERAMORE, teleport = "Teleport: Theramore",     portal = "Portal: Theramore" },
+    { label = MINIMAGE_LABEL_SW,        teleport = "Teleport: Stormwind",     portal = "Portal: Stormwind" },
+    { label = MINIMAGE_LABEL_IF,        teleport = "Teleport: Ironforge",     portal = "Portal: Ironforge" },
+    { label = MINIMAGE_LABEL_DARNASSUS, teleport = "Teleport: Darnassus",     portal = "Portal: Darnassus" },
+}
 
-    if not MiniMageOptions.HidePortals then
-        local info = { };
-        info.text = MINIMAGE_LABEL_PORTAL;
-        info.isTitle = 1;
-        info.notCheckable = 1;
-
-        info.tooltipTitle = info.text
-        info.tooltipText = "Portal spells"
-        info.tooltipOnButton = true
-
-        UIDropDownMenu_AddButton(info);
-
-        -- ORG PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_ORG;
-        info.disabled = not MM_CanCastSpell("Portal: Orgrimmar");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Orgrimmar") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_ORG);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- STONARD PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_STONARD;
-        info.disabled = not MM_CanCastSpell("Portal: Stonard");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Stonard") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_STONARD);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- TB PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_TB;
-        info.disabled = not MM_CanCastSpell("Portal: Thunder Bluff");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Thunder Bluff") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_TB);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- UC PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_UC;
-        info.disabled = not MM_CanCastSpell("Portal: Undercity");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Undercity") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_UC);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-    end
-
-    -- TELEPORT SECTION
-    local info = { };
-    info.text = MINIMAGE_LABEL_TELEPORT;
-    info.isTitle = 1;
-    info.notCheckable = 1;
-
-    UIDropDownMenu_AddButton(info);
-
-    -- ORG TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_ORG;
-    info.disabled = not MM_CanCastSpell("Teleport: Orgrimmar");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Orgrimmar") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_ORG);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- STONARD TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_STONARD;
-    info.disabled = not MM_CanCastSpell("Teleport: Stonard");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Stonard") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_STONARD);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- TB TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_TB;
-    info.disabled = not MM_CanCastSpell("Teleport: Thunder Bluff");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Thunder Bluff") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_TB);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- UC TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_UC;
-    info.disabled = not MM_CanCastSpell("Teleport: Undercity");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Undercity") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_UC);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
+local function MM_AddSectionTitle(text, tooltipText)
+    local info = { }
+    info.text = text
+    info.isTitle = 1
+    info.notCheckable = 1
+    info.tooltipTitle = text
+    info.tooltipText = tooltipText
+    info.tooltipOnButton = true
+    UIDropDownMenu_AddButton(info)
 end
 
------------------------------------------------------
--- ALLIANCE
------------------------------------------------------
+local function MM_AddSpellButton(cityLabel, spellName)
+    local info = { }
+    info.text = cityLabel
+    info.disabled = not MM_CanCastSpell(spellName)
+    info.func = function()
+        if MM_CanCastSpell(spellName) then
+            MM_TryCast(spellName)
+        end
+    end
+    UIDropDownMenu_AddButton(info)
+end
 
-function MM_DropDown_ForTheAlliance()
-    local appender = ': ';
+local function MM_AddSeparator()
+    local info = { }
+    info.text = "----------------"
+    info.disabled = 1
+    info.notCheckable = 1
+    UIDropDownMenu_AddButton(info)
+end
 
-    -- 🔥 REQUIRED ADDITION: Auto-hide portals if player level < 40
-    if UnitLevel("player") < 40 then
-        MiniMageOptions.HidePortals = true
+local function MM_AddFactionSpellGroup(cityList, spellType)
+    for _, city in ipairs(cityList) do
+        MM_AddSpellButton(city.label, city[spellType])
+    end
+end
+
+function MM_DropDown_AllCities()
+    local hidePortals = MiniMageOptions.HidePortals or UnitLevel("player") < 40
+
+    if not hidePortals then
+        MM_AddSectionTitle(MINIMAGE_LABEL_PORTAL, "Portal spells")
+        MM_AddFactionSpellGroup(MM_HordeCities, "portal")
+        MM_AddSeparator()
+        MM_AddFactionSpellGroup(MM_AllianceCities, "portal")
     end
 
-    if not MiniMageOptions.HidePortals then
-        local info = { };
-        info.text = MINIMAGE_LABEL_PORTAL;
-        info.isTitle = 1;
-        info.notCheckable = 1;
-
-        UIDropDownMenu_AddButton(info);
-
-        -- ALAH PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_ALAH;
-        info.disabled = not MM_CanCastSpell("Portal: Alah'Thalas");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Alah'Thalas") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_ALAH);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- DARNASSUS PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_DARNASSUS;
-        info.disabled = not MM_CanCastSpell("Portal: Darnassus");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Darnassus") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_DARNASSUS);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- IF PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_IF;
-        info.disabled = not MM_CanCastSpell("Portal: Ironforge");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Ironforge") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_IF);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- SW PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_SW;
-        info.disabled = not MM_CanCastSpell("Portal: Stormwind");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Stormwind") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_SW);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-
-        -- THERAMORE PORTAL
-        info = { };
-        info.text = MINIMAGE_LABEL_THERAMORE;
-        info.disabled = not MM_CanCastSpell("Portal: Theramore");
-        info.func = function(msg)
-            if MM_CanCastSpell("Portal: Theramore") then
-                MM_TryCast(MINIMAGE_LABEL_PORTAL..appender..MINIMAGE_LABEL_THERAMORE);
-            end
-        end;
-        UIDropDownMenu_AddButton(info);
-    end
-
-    -- TELEPORT TITLE
-    local info = { };
-    info.text = MINIMAGE_LABEL_TELEPORT;
-    info.isTitle = 1;
-    info.notCheckable = 1;
-
-    UIDropDownMenu_AddButton(info);
-
-    -- ALAH TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_ALAH;
-    info.disabled = not MM_CanCastSpell("Teleport: Alah'Thalas");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Alah'Thalas") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_ALAH);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- DARN TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_DARNASSUS;
-    info.disabled = not MM_CanCastSpell("Teleport: Darnassus");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Darnassus") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_DARNASSUS);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- IF TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_IF;
-    info.disabled = not MM_CanCastSpell("Teleport: Ironforge");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Ironforge") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_IF);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- SW TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_SW;
-    info.disabled = not MM_CanCastSpell("Teleport: Stormwind");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Stormwind") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_SW);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
-
-    -- THERAMORE TELEPORT
-    info = { };
-    info.text = MINIMAGE_LABEL_THERAMORE;
-    info.disabled = not MM_CanCastSpell("Teleport: Theramore");
-    info.func = function(msg)
-        if MM_CanCastSpell("Teleport: Theramore") then
-            MM_TryCast(MINIMAGE_LABEL_TELEPORT..appender..MINIMAGE_LABEL_THERAMORE);
-        end
-    end;
-    UIDropDownMenu_AddButton(info);
+    MM_AddSectionTitle(MINIMAGE_LABEL_TELEPORT, "Teleport spells")
+    MM_AddFactionSpellGroup(MM_HordeCities, "teleport")
+    MM_AddSeparator()
+    MM_AddFactionSpellGroup(MM_AllianceCities, "teleport")
 end
 
 --
